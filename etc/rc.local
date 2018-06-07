@@ -1,0 +1,29 @@
+#! /bin/sh
+
+VERSION=1
+
+
+if [ ! -e "/etc/.cloudberry-sysinit" ]; then
+  CURRENT_VERSION=0
+else
+  CURRENT_VERSION="$("/etc/.cloudberry-sysinit")"
+fi
+
+if [ $VERSION -gt $CURRENT_VERSION ]; then
+
+  opkg update
+  opkg install openwisp-config-openssl
+
+  if ! grep "INIT-OPENWISP DONE" /usr/sbin/openwisp_config > /dev/null; then
+    sed \
+      -i /usr/sbin/openwisp_config \
+      -e 's+\(FETCH_COMMAND=".*\) --capath $CAPATH"+if echo $URL | grep http:// > /dev/null; then \1"; else \1 --capath $CAPATH"; fi+g'
+    echo "# INIT-OPENWISP DONE" >> /usr/sbin/openwisp_config
+  fi
+
+  echo $VERSION > "/etc/.cloudberry-sysinit"
+
+
+fi
+
+exit 0

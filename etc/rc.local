@@ -10,7 +10,7 @@ else
 fi
 
 if [ $VERSION -gt $CURRENT_VERSION ]; then
-
+    
   opkg update
   opkg install openwisp-config-openssl
 
@@ -23,6 +23,8 @@ if [ $VERSION -gt $CURRENT_VERSION ]; then
 
   echo $VERSION > "/etc/.cloudberry-sysinit"
 
+  # Somehow the above leaves the system in a wierd state, so reboot to get back to normal...
+  reboot
 
 fi
 
